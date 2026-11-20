@@ -246,13 +246,19 @@ button { color: inherit; }
     else openUrl("https://www.google.com/search?q=" + encodeURIComponent(value));
   });
 
+  function syncSystemBars(isDark) {
+    if (window.Dymith && typeof window.Dymith.setTheme === "function") window.Dymith.setTheme(Boolean(isDark));
+  }
+
   document.getElementById("theme").addEventListener("click", () => {
     const next = root.dataset.theme === "dark" ? "light" : "dark";
     root.dataset.theme = next;
     document.querySelector('meta[name="theme-color"]').content = next === "dark" ? "#080808" : "#fafafa";
+    syncSystemBars(next === "dark");
   });
 
   updateClock();
+  syncSystemBars(root.dataset.theme === "dark" || (root.dataset.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
   window.setInterval(updateClock, 15000);
 })();
 </script>
