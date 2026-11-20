@@ -1,21 +1,20 @@
 package com.dymith.browser
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.webkit.JavascriptInterface
-import android.webkit.SafeBrowsingResponse
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.activity.addCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
     private lateinit var browser: WebView
     private val startPage = "file:///android_asset/start.html"
 
@@ -26,6 +25,10 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isStatusBarContrastEnforced = false
+            window.isNavigationBarContrastEnforced = false
+        }
 
         browser = WebView(this).apply {
             setBackgroundColor(Color.BLACK)
@@ -38,7 +41,9 @@ class MainActivity : AppCompatActivity() {
             settings.allowFileAccessFromFileURLs = false
             settings.allowUniversalAccessFromFileURLs = false
             settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
-            settings.safeBrowsingEnabled = true
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                settings.safeBrowsingEnabled = true
+            }
 
             addJavascriptInterface(BrowserBridge(), "Dymith")
             webChromeClient = WebChromeClient()
@@ -64,21 +69,27 @@ class MainActivity : AppCompatActivity() {
         } else {
             browser.restoreState(savedInstanceState)
         }
+    }
 
-        onBackPressedDispatcher.addCallback(this) {
-            if (browser.canGoBack()) browser.goBack() else finish()
+    override fun onBackPressed() {
+        if (::browser.isInitialized && browser.canGoBack()) {
+            browser.goBack()
+        } else {
+            super.onBackPressed()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        browser.saveState(outState)
+        if (::browser.isInitialized) browser.saveState(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
-        browser.removeJavascriptInterface("Dymith")
-        browser.stopLoading()
-        browser.destroy()
+        if (::browser.isInitialized) {
+            browser.removeJavascriptInterface("Dymith")
+            browser.stopLoading()
+            browser.destroy()
+        }
         super.onDestroy()
     }
 
@@ -96,8 +107,7 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun open(rawUrl: String) {
             val safeUrl = rawUrl.trim()
-            val isWebUrl = safeUrl.startsWith("https://") || safeUrl.startsWith("http://")
-            if (!isWebUrl) return
+            if (!safeUrl.startsWith("https://") && !safeUrl.startsWith("http://")) return
             runOnUiThread { browser.loadUrl(safeUrl) }
         }
 
