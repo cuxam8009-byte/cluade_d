@@ -11,6 +11,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -24,6 +25,10 @@ class MainActivity : Activity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isStatusBarContrastEnforced = false
             window.isNavigationBarContrastEnforced = false
@@ -93,6 +98,16 @@ class MainActivity : Activity() {
             val safeUrl = rawUrl.trim()
             if (!safeUrl.startsWith("https://") && !safeUrl.startsWith("http://")) return
             runOnUiThread { browser.loadUrl(safeUrl) }
+        }
+
+        @JavascriptInterface
+        fun setTheme(isDark: Boolean) {
+            runOnUiThread {
+                WindowInsetsControllerCompat(window, window.decorView).apply {
+                    isAppearanceLightStatusBars = !isDark
+                    isAppearanceLightNavigationBars = !isDark
+                }
+            }
         }
 
         @JavascriptInterface
