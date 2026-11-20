@@ -68,9 +68,9 @@ if [ ! -x "$CLANG" ]; then
 fi
 
 # ---------------------------------------------------------------- 3. Rust
-banner "3/8 Rust: thêm target + chạy unit test (không chặn build)"
+banner "3/8 Rust: thêm target + chạy unit test (bắt buộc)"
 rustup target add aarch64-linux-android
-cargo test --manifest-path core/Cargo.toml || echo "CẢNH BÁO: unit test Rust thất bại (không chặn build)"
+cargo test --locked --manifest-path core/Cargo.toml
 
 banner "4/8 Rust: biên dịch lõi cho arm64 (release)"
 export CC_aarch64_linux_android="$CLANG"
@@ -99,13 +99,13 @@ fi
 echo "ELF căn 16 KB: OK"
 
 # ---------------------------------------------------------------- 6. Gradle
-banner "6/8 Khóa ký debug cố định + Gradle assembleRelease"
+banner "6/8 Tạo khóa debug tạm thời + Gradle assembleRelease"
 mkdir -p app/signing
 if [ ! -f app/signing/dymith-debug.p12 ]; then
   keytool -genkeypair -storetype PKCS12 -keystore app/signing/dymith-debug.p12 \
     -storepass android -keypass android -alias dymith -keyalg RSA -keysize 2048 \
     -validity 36500 -dname "CN=Dymith Debug, O=Dymith, C=VN"
-  echo "Đã tạo khóa debug mới (sẽ được lưu vào repo)"
+  echo "Đã tạo khóa debug tạm thời cho lần build này (không lưu vào repo)"
 fi
 
 GRADLE_DIR="$HOME/.dymith-gradle/gradle-$GRADLE_VERSION"
