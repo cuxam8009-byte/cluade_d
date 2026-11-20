@@ -1,2 +1,1 @@
--keepattributes SourceFile,LineNumberTable
--keep class dev.dymith.browser.Core { *; }
+# App-specific R8 rules.

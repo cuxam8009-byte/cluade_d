@@ -1,23 +1,19 @@
-# Dymith Browser
+# Dymith
 
-Trình duyệt Android nhẹ, lõi viết bằng Rust, giao diện kính kiểu Apple.
-Repo đang ở **Phase 0**: dựng đường ống build và đo đạc trên máy thật.
+A fresh Android browser foundation with a minimal, animated home screen inspired by the supplied Hybrust concept.
 
-## Cấu trúc
+## Included
+- Android WebView shell and local HTML/CSS/JS home screen.
+- Animated geometric launch mark and Dymith wordmark.
+- Vietnamese greeting, live clock and date.
+- Eight quick links, search/address input, light/dark toggle.
+- HTTP(S)-only navigation and mixed-content blocking.
+- JavaScript bridge removed when remote pages load.
+- GitHub Actions debug APK build workflow.
 
-| Thư mục | Nội dung |
-|---|---|
-| `core/` | Lõi Rust: phân giải ô địa chỉ, chặn quảng cáo mẫu, cầu JNI sang Kotlin |
-| `app/` | Vỏ Android (Kotlin, View thuần): WebView + thanh công cụ kính + chẩn đoán |
-| `ci/build.sh` | Toàn bộ quy trình build: Rust, kiểm tra căn 16 KB, Gradle, Release |
-| `docs/PHASE0.md` | Danh sách bài thử cho Phase 0 |
+## Build
+Open in Android Studio with JDK 17 and Android SDK 35, then run the app configuration. CI uploads the debug APK as an artifact.
 
-## Cập nhật mã
+Package: com.dymith.browser
 
-Upload một file `.zip` vào thư mục gốc của repo. Workflow `Dymith build` sẽ tự giải nén,
-commit, dựng APK và đăng lên mục Releases (tag `nightly`).
-
-## Kiến trúc
-
-Lõi Rust nói chuyện với vỏ Kotlin qua JNI. Engine web đứng sau một giao diện trừu tượng:
-v1 dùng WebView hệ thống, Servo và GeckoView là các hướng thử nghiệm ở Phase 3.
+This is version 0.1.0, not a production-ready browser. Tabs, bookmarks, downloads, private mode, permission UX, and a full security review remain future work.
