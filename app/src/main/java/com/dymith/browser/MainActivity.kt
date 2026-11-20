@@ -45,20 +45,24 @@ class MainActivity : Activity() {
                 settings.safeBrowsingEnabled = true
             }
 
-            addJavascriptInterface(BrowserBridge(), "Dymith")
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView, url: String, favicon: android.graphics.Bitmap?) {
+                    if (url == startPage) {
+                        view.addJavascriptInterface(BrowserBridge(), "Dymith")
+                    } else {
+                        // Never expose the native bridge to remote page scripts or iframes.
+                        view.removeJavascriptInterface("Dymith")
+                    }
+                    super.onPageStarted(view, url, favicon)
+                }
+
                 override fun shouldOverrideUrlLoading(
                     view: WebView,
                     request: WebResourceRequest
                 ): Boolean {
-                    val uri = request.url
-                    val scheme = uri.scheme?.lowercase()
-                    return when {
-                        uri.toString() == startPage -> false
-                        scheme == "https" || scheme == "http" -> false
-                        else -> true
-                    }
+                    val scheme = request.url.scheme?.lowercase()
+                    return scheme != "https" && scheme != "http"
                 }
             }
         }
