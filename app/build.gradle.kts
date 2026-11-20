@@ -19,8 +19,8 @@ android {
         }
     }
 
-    // Phase 0: ký bằng một debug keystore cố định (do CI tạo lần đầu) để bản mới cài đè được bản cũ.
-    // Keystore phát hành thật sẽ đưa vào GitHub Secrets ở Phase 1.
+    // CI tạo debug keystore tạm thời tại app/signing/ trước khi chạy Gradle.
+    // Không commit keystore vào Git; khóa phát hành thật phải lấy từ GitHub Secrets.
     signingConfigs {
         create("dymith") {
             storeFile = file("signing/dymith-debug.p12")
